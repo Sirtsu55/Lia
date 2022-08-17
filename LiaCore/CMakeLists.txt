@@ -2,9 +2,9 @@
 
 set (CMAKE_CXX_STANDARD 20)
 
-file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/LiaCore/*")
+file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/LiaCore/Source/*")
 
-list(APPEND SRC_FILES ${SRC_C_FILES})
+
 
 add_executable(LiaCore ${SRC_FILES})
 
