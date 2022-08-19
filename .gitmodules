@@ -7,3 +7,6 @@
 [submodule "Vendor/glm"]
 	path = Vendor/glm
 	url = https://github.com/Sirtsu55/glm.git
+[submodule "Vendor/DiligentCore"]
+	path = Vendor/DiligentCore
+	url = https://github.com/Sirtsu55/DiligentCore.git
