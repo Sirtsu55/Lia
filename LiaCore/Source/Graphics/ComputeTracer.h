@@ -3,14 +3,22 @@
 
 namespace Lia
 {
+
+	
+
 	class ComputeTracer : public Tracer
 	{
 	public:
-		ComputeTracer();
+
+
+		ComputeTracer(const CreateInfo& cInf);
 		~ComputeTracer();
+
+
+
+
+
 	private:
-
-
 
 	};
 

@@ -40,7 +40,11 @@ namespace Lia
     
     void Window::Init()
     {
-        assert(glfwInit());
+        if (!glfwInit())
+        {
+            LOG_CRITICAL("[GLFW]: INITIALIZATON FAILED, EXITING APPLICATION");
+            exit(-1);
+        };
     }
     
     void Window::DeInit()
