@@ -4,6 +4,8 @@ project(Lia)
 
 add_subdirectory("LiaCore")
 
+add_subdirectory("Vendor/spdlog")
+
 add_subdirectory("Vendor/glfw")
 
-add_subdirectory("Vendor/spdlog")
+add_subdirectory("Vendor/DiligentCore")

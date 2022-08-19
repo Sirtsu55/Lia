@@ -25,15 +25,17 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-//#define GLFW_INCLUDE_VULKAN
+#define GLFW_INCLUDE_VULKAN
+
+#if WIN32
+#define GLFW_EXPOSE_NATIVE_WIN32
+#endif
+
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
-
-//#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-//#include <vulkan/vulkan.hpp>
-
-
+#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+#include <vulkan/vulkan.hpp>
 
 //---------------------------------------
 //Shared Pointers
