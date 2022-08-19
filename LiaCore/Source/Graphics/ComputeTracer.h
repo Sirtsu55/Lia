@@ -10,14 +10,14 @@ namespace Lia
 	{
 	public:
 
-
+		//Do not use this method, Create the ComputeTracer from Lia::Tracer::CreateComputeTracer
 		ComputeTracer(const CreateInfo& cInf);
 		~ComputeTracer();
 
 
 
 
-
+		
 	private:
 
 	};
