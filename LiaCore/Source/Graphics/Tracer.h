@@ -31,6 +31,8 @@ namespace Lia
 		Sptr<Window> mWindow;
 		dg::IRenderDevice* mDevice;
 		dg::IDeviceContext* mImmediateContext;
+		dg::IEngineFactoryVk* mEngineFactoryVk;
+
 		dg::ISwapChain* mSwapChain;
 
 

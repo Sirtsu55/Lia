@@ -15,9 +15,9 @@ namespace Lia
 	{
 		dg::EngineVkCreateInfo EngineCI;
 		EngineCI.Features.ComputeShaders = dg::DEVICE_FEATURE_STATE::DEVICE_FEATURE_STATE_ENABLED;
-		
-		auto* pFactoryVk = dg::GetEngineFactoryVk();
-		pFactoryVk->CreateDeviceAndContextsVk(EngineCI, &mDevice, &mImmediateContext);
+
+		mEngineFactoryVk = dg::GetEngineFactoryVk();
+		mEngineFactoryVk->CreateDeviceAndContextsVk(EngineCI, &mDevice, &mImmediateContext);
 
 		dg::NativeWindow nativeWin;
 
@@ -25,13 +25,14 @@ namespace Lia
 
 		dg::SwapChainDesc swapDC{};
 	
-
-		pFactoryVk->CreateSwapChainVk(mDevice, mImmediateContext, swapDC, nativeWin, &mSwapChain);
-
+		mEngineFactoryVk->CreateSwapChainVk(mDevice, mImmediateContext, swapDC, nativeWin, &mSwapChain);
+		
 	}
 
 	ComputeTracer::~ComputeTracer()
 	{
+
+
 	}
 
 
