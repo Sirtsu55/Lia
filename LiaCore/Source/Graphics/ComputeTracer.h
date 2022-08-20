@@ -15,7 +15,9 @@ namespace Lia
 		~ComputeTracer();
 
 
-
+		void BeginFrame() override;
+		void EndFrame() override;
+	
 
 		
 	private:

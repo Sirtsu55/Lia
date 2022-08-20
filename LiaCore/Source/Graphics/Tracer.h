@@ -22,6 +22,8 @@ namespace Lia
 
 		static Sptr<Tracer> CreateComputeTracer(const CreateInfo& cInf);
 
+		virtual void BeginFrame() = 0;
+		virtual void EndFrame() = 0;
 	private:
 
 
@@ -30,7 +32,7 @@ namespace Lia
 	protected:
 		Sptr<Window> mWindow;
 		dg::IRenderDevice* mDevice;
-		dg::IDeviceContext* mImmediateContext;
+		dg::IDeviceContext* mContext;
 		dg::IEngineFactoryVk* mEngineFactoryVk;
 
 		dg::ISwapChain* mSwapChain;

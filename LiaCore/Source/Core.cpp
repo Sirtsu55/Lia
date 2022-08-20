@@ -22,10 +22,16 @@ int main()
         Sptr<Lia::Tracer> tracer = Lia::Tracer::CreateComputeTracer(tracerInf);
 
 
-        
+        SimpleTimer frametimer;
+
         while (win->IsActive())
         {
+            frametimer.Start();
+            tracer->BeginFrame();
             win->UpdateInput();
+            tracer->EndFrame();
+            double time = frametimer.Endd(TimerAccuracy::MilliSec);
+            LOG_INFO("[FrameTime]: {} [FPS]: {}", time, 1000 / time);
         }
     }
     
