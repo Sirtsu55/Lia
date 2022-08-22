@@ -22,6 +22,10 @@ namespace Lia
 
 		static Sptr<Tracer> CreateComputeTracer(const CreateInfo& cInf);
 
+
+		virtual void DrawTriangle() = 0;
+
+
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame() = 0;
 	private:
