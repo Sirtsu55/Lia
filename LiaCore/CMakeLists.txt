@@ -33,6 +33,15 @@ target_link_libraries(LiaCore "spdlog")
 target_link_directories(LiaCore PUBLIC "${PROJECT_SOURCE_DIR}/Vendor/DiligentCore")
 target_link_libraries(LiaCore Diligent-GraphicsEngineVk-shared)
 
+
+#Will copy the required Shared libraries to the executable directory
+add_custom_command(
+        TARGET LiaCore POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/LiaCore/Shaders/
+                ${CMAKE_CURRENT_BINARY_DIR}/Shaders/)
+
+
 #Will copy the required Shared libraries to the executable directory
 add_custom_command(TARGET LiaCore POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:LiaCore> $<TARGET_FILE_DIR:LiaCore>

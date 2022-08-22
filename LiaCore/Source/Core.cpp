@@ -28,6 +28,7 @@ int main()
         {
             frametimer.Start();
             tracer->BeginFrame();
+            tracer->DrawTriangle();
             win->UpdateInput();
             tracer->EndFrame();
             double time = frametimer.Endd(TimerAccuracy::MilliSec);

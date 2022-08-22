@@ -3,7 +3,6 @@
 
 
 
-
 namespace Lia
 {
 	Sptr<Tracer> Tracer::CreateComputeTracer(const CreateInfo& cInf)
@@ -67,6 +66,41 @@ namespace Lia
 	{
 		mContext->FinishFrame();
 		mSwapChain->Present(0);
+	}
+
+	void ComputeTracer::DrawTriangle()
+	{
+		if (!pipelineInitialized)
+		{
+			pipelineInitialized = true;
+
+			dg::GraphicsPipelineStateCreateInfo PSOcreate{};
+
+			PSOcreate.PSODesc.Name = "Triangle PSO";
+			PSOcreate.PSODesc.PipelineType = dg::PIPELINE_TYPE_GRAPHICS;
+
+			PSOcreate.GraphicsPipeline.NumRenderTargets = 1;
+			PSOcreate.GraphicsPipeline.PrimitiveTopology = dg::PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+			PSOcreate.GraphicsPipeline.RasterizerDesc.CullMode = dg::CULL_MODE_NONE;
+			PSOcreate.GraphicsPipeline.DepthStencilDesc.DepthEnable = false;
+
+
+			dg::ShaderCreateInfo shaderCI;
+			shaderCI.SourceLanguage = dg::SHADER_SOURCE_LANGUAGE_HLSL;
+			shaderCI.UseCombinedTextureSamplers = true;
+
+			{
+				std::cout << std::filesystem::current_path().string();
+				pxSdr = CreateSptr<dg::IShader*>();
+				shaderCI.EntryPoint = "main";
+				shaderCI.Desc.ShaderType = dg::SHADER_TYPE_PIXEL;
+
+				mDevice->CreateShader(shaderCI, pxSdr.get());
+			}
+
+
+
+		}
 	}
 
 
