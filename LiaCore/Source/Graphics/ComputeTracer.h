@@ -18,6 +18,7 @@ namespace Lia
 
 		void BeginFrame() override;
 		void EndFrame() override;
+
 	
 		void DrawTriangle() override;
 		

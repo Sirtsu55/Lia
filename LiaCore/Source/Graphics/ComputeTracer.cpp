@@ -1,5 +1,5 @@
 #include "ComputeTracer.h"
-
+#include "Utils/FileRead.h"
 
 
 
@@ -89,11 +89,17 @@ namespace Lia
 			shaderCI.SourceLanguage = dg::SHADER_SOURCE_LANGUAGE_HLSL;
 			shaderCI.UseCombinedTextureSamplers = true;
 
+			std::vector<char> bytecode;
+			ReadFile("Shaders/TrianglePix.frag.spv", bytecode);
 			{
-				std::cout << std::filesystem::current_path().string();
 				pxSdr = CreateSptr<dg::IShader*>();
 				shaderCI.EntryPoint = "main";
 				shaderCI.Desc.ShaderType = dg::SHADER_TYPE_PIXEL;
+				shaderCI.SourceLanguage = dg::SHADER_SOURCE_LANGUAGE::SHADER_SOURCE_LANGUAGE_GLSL;
+				shaderCI.ByteCode = bytecode.data();
+				shaderCI.ByteCodeSize = bytecode.size();
+				
+
 
 				mDevice->CreateShader(shaderCI, pxSdr.get());
 			}

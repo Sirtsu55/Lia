@@ -1,9 +1,11 @@
 
-find_package(Vulkan REQUIRED FATAL_ERROR)
+find_package(Vulkan REQUIRED FATAL_ERROR COMPONENTS glslangValidator)
+find_program(glslangValidator NAMES glslangValidator)
 set (CMAKE_CXX_STANDARD 20)
+message(${glslangValidator})
+
 
 file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/LiaCore/Source/*")
-
 
 
 add_executable(LiaCore ${SRC_FILES})
@@ -33,14 +35,8 @@ target_link_libraries(LiaCore "spdlog")
 target_link_directories(LiaCore PUBLIC "${PROJECT_SOURCE_DIR}/Vendor/DiligentCore")
 target_link_libraries(LiaCore Diligent-GraphicsEngineVk-shared)
 
-
-#Will copy the required Shared libraries to the executable directory
-add_custom_command(
-        TARGET LiaCore POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-                ${CMAKE_SOURCE_DIR}/LiaCore/Shaders/
-                ${CMAKE_CURRENT_BINARY_DIR}/Shaders/)
-
+include("${PROJECT_SOURCE_DIR}/LiaCore/ShaderCompile.cmake")
+CompileShaders()
 
 #Will copy the required Shared libraries to the executable directory
 add_custom_command(TARGET LiaCore POST_BUILD
