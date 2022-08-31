@@ -25,18 +25,25 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define GLFW_INCLUDE_VULKAN
+//#define GLFW_INCLUDE_VULKAN
 
-#if WIN32
+#ifdef WIN32
 #define GLFW_EXPOSE_NATIVE_WIN32
-#endif
+#elif X11
+#define GLFW_EXPOSE_NATIVE_X11
+#elif WAYLAND
+#define GLFW_EXPOSE_NATIVE_WAYLAND
+#endif //Detect Platform
 
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
-#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
-#include <vulkan/vulkan.hpp>
 
+//#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+//#include <vulkan/vulkan.hpp>
+#include <webgpu/webgpu_cpp.h>
+#include <dawn/native/DawnNative.h>
+#include <dawn/dawn_proc.h>
 //---------------------------------------
 //Shared Pointers
 //---------------------------------------

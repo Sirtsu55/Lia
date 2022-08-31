@@ -14,7 +14,7 @@ target_include_directories(LiaCore PUBLIC
 	"${PROJECT_SOURCE_DIR}/Vendor/glfw/include/"
 	"${PROJECT_SOURCE_DIR}/Vendor/spdlog/include/"
 	"${PROJECT_SOURCE_DIR}/Vendor/glm/"
-	"${PROJECT_SOURCE_DIR}/Vendor/DiligentCore/Graphics/GraphicsEngineVulkan/interface/"
+	"${PROJECT_SOURCE_DIR}/Vendor/Dawn/Include/"
 	"${PROJECT_SOURCE_DIR}/LiaCore/Source/"
 )
 
@@ -31,11 +31,27 @@ target_link_libraries(LiaCore "glfw")
 target_link_directories(LiaCore PUBLIC "${PROJECT_SOURCE_DIR}/Vendor/spdlog/src")
 target_link_libraries(LiaCore "spdlog")
 
+target_link_directories(LiaCore PUBLIC "${PROJECT_SOURCE_DIR}/Vendor/Dawn")
+
+target_link_directories(LiaCore PUBLIC "${PROJECT_SOURCE_DIR}/Vendor/Dawn/${LIA_PLATFORM}/${CMAKE_BUILD_TYPE}")
+message("${PROJECT_SOURCE_DIR}/Vendor/Dawn/${LIA_PLATFORM}/${CMAKE_BUILD_TYPE}")
+target_link_libraries(LiaCore "dawn_proc")
+target_link_libraries(LiaCore "dawn_native")
+target_link_libraries(LiaCore "dawn_platform")
+target_link_libraries(LiaCore "dawncpp")
+
+message(${CMAKE_BUILD_TYPE})
+
+
+
+
 include("${PROJECT_SOURCE_DIR}/LiaCore/ShaderCompile.cmake")
+include("${PROJECT_SOURCE_DIR}/LiaCore/CopySharedLib.cmake")
 CompileShaders()
 
-#Will copy the required Shared libraries to the executable directory
-#add_custom_command(TARGET LiaCore POST_BUILD
-#  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:LiaCore> $<TARGET_FILE_DIR:LiaCore>
-#  COMMAND_EXPAND_LISTS
-#  )
+
+#Copies all depending SHARED LIBS to the executable directory
+CopySharedLib("dawn_proc")
+CopySharedLib("dawn_native")
+CopySharedLib("dawn_platform")
+
