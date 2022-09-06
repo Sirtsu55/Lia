@@ -20,8 +20,7 @@ namespace Lia
         
     
         glfwSetWindowUserPointer(mWindow, this);
-    
-    
+
     }
     
     

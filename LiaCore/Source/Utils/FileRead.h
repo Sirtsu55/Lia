@@ -3,7 +3,7 @@
 
 
 template<typename T>
-bool ReadFile(const std::string& filePath, std::vector<T>& outVector)
+bool FileRead(const std::string& filePath, std::vector<T>& outVector)
 {
 	//open the file. With cursor at the end
 	std::ifstream file(filePath, std::ios::ate | std::ios::binary);

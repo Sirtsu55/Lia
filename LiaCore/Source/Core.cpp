@@ -7,6 +7,7 @@ int main()
 	Log::Init();
     Lia::Window::Init();
 
+    SimpleTimer timer;
     {
         Lia::Window::Settings settings = { .Name = "LiaEngine", .Resolution = glm::ivec2(1280, 720) };
         
@@ -16,12 +17,14 @@ int main()
         Sptr<Lia::Device> dev = CreateSptr<Lia::Device>(devSettings);
 
         SimpleTimer frametimer;
-
+        dev->SetupCompute();
         while (win->IsActive())
         {
-            dev->ClearScreen(glm::vec3(1.0f, 0.0f, 0.0f));
-            dev->Present();
+            //timer.Start();
+            dev->BeginFrame();
+            dev->EndFrame();
             win->UpdateInput();
+            //LOG_INFO("Frame Time: {} ms", timer.Endd(TimerAccuracy::MilliSec));
         }
     }
     

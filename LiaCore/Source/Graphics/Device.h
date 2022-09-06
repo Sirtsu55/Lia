@@ -4,6 +4,13 @@
 
 namespace Lia
 {
+	class ComputeShader;
+	class Buffer;
+	class Texture;
+
+	//Create Everything to render on the screen
+	//-Creates a Swapchain
+	//-Sets up Imgui rendering for the given window
 	class Device
 	{
 
@@ -22,11 +29,21 @@ namespace Lia
 		Device(Device&) = delete;
 		Device& operator=(Device&) = delete;
 
-		void ClearScreen(const glm::vec3& color);
+		//TESTING
+		void SetupCompute();
+		void BeginFrame();
 
-		void Present();
+		void EndFrame();
 
 	private:
+		//TESTING
+		glm::vec3 color;
+
+		Uptr<ComputeShader> mCompShader;
+		wgpu::BindGroup mComputeBindGroup;
+		Uptr<Texture> mTex;
+		Sptr<wgpu::TextureView> mTexview;
+
 
 		void SetupSwapchain();
 		void CreateDevice();
@@ -38,8 +55,7 @@ namespace Lia
 			wgpu::Instance Instance;
 			wgpu::SwapChain Swapchain;
 		};
-		Uptr<GpuObjects> mGpuObjs;
-		
+		Uptr<GpuObjects> mGfx;
 
 		Sptr<Window> mWindow;
 	};

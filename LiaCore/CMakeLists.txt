@@ -4,9 +4,19 @@ find_program(glslangValidator NAMES glslangValidator)
 set (CMAKE_CXX_STANDARD 20)
 message(${glslangValidator})
 
+#IMGUI Sources
+file(GLOB IMGUI_SRC_FILES "${PROJECT_SOURCE_DIR}/Vendor/imgui/*.cpp"
+"${PROJECT_SOURCE_DIR}/Vendor/imgui/backends/imgui_impl_glfw.cpp"
+"${PROJECT_SOURCE_DIR}/Vendor/imgui/backends/imgui_impl_wgpu.cpp")
 
-file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/LiaCore/Source/*")
+#list(APPEND IMGUI_SRC_FILES "${PROJECT_SOURCE_DIR}/Vendor/imgui/backends/imgui_impl_glfw.cpp${PROJECT_SOURCE_DIR}/Vendor/imgui/backends/imgui_impl_wgpu.cpp")
 
+message(${IMGUI_SRC_FILES})
+file(GLOB_RECURSE SRC_FILES "${PROJECT_SOURCE_DIR}/LiaCore/Source/*.cpp")
+file(GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/LiaCore/Source/*.h")
+
+list(APPEND SRC_FILES ${HEADER_FILES})
+list(APPEND SRC_FILES ${IMGUI_SRC_FILES})
 
 add_executable(LiaCore ${SRC_FILES})
 
@@ -15,8 +25,10 @@ target_include_directories(LiaCore PUBLIC
 	"${PROJECT_SOURCE_DIR}/Vendor/spdlog/include/"
 	"${PROJECT_SOURCE_DIR}/Vendor/glm/"
 	"${PROJECT_SOURCE_DIR}/Vendor/Dawn/Include/"
+	"${PROJECT_SOURCE_DIR}/Vendor/imgui/"
 	"${PROJECT_SOURCE_DIR}/LiaCore/Source/"
 )
+
 
 
 message("$ENV{VULKAN_SDK}/Include/")

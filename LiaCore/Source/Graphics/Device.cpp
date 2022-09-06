@@ -1,5 +1,8 @@
 #include "Device.h"
-
+#include "Callbacks.h"
+#include "ComputeShader.h"
+#include "Buffer.h"
+#include "Texture.h"
 
 namespace Lia
 {
@@ -7,7 +10,7 @@ namespace Lia
 		: mWindow(settings.Win)
 	{
 
-		mGpuObjs = CreateUptr<GpuObjects>();
+		mGfx = CreateUptr<GpuObjects>();
 		//Set procs for the dawn backend, so that the functions get loaded
 		DawnProcTable backendProcs = dawn::native::GetProcs();
 		dawnProcSetProcs(&backendProcs);
@@ -15,70 +18,124 @@ namespace Lia
 		CreateDevice();
 		SetupSwapchain();
 
+		//Setup Imgui
 
 		
+		ImGui::CreateContext();
+		ImGuiIO io = ImGui::GetIO();
+		io.ConfigFlags = ImGuiConfigFlags_DockingEnable;
+		// Setup Dear ImGui style
+		ImGui::StyleColorsDark();
+		ImGui_ImplGlfw_InitForOther(mWindow->GetGLFWWindow(), true);
+		ImGui_ImplWGPU_Init(mGfx->Device.Get(), 3, WGPUTextureFormat_BGRA8Unorm);
 	}
 
 	Device::~Device()
 	{
+		ImGui_ImplWGPU_Shutdown();
+
+		mGfx->Device.Destroy();
+	}
+	void Device::SetupCompute()
+	{
+		mCompShader = CreateUptr<ComputeShader>(mGfx->Device,"Shaders/Compute.comp.spv");
+		Texture::TextureInfo inf{};
+		inf.Dimentions = glm::uvec2(mWindow->GetDimensions());
+		inf.Format = wgpu::TextureFormat::RGBA16Float;
+		inf.Usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::StorageBinding;
+
+		mTex = CreateUptr<Texture>(mGfx->Device, inf);
+		mTexview = mTex->GetView();
+		mCompShader->BindGroupManager.AddStorageTexture(GetSmartPtrAsRef<Texture>(mTex), 0);
+		mCompShader->BindGroupManager.ConstructBindGroups(mGfx->Device);
+
+		mCompShader->CreatePipeline();
 	}
 
 
-	void Device::ClearScreen(const glm::vec3& color)
+	void Device::BeginFrame()
 	{
+		//Setup Imgui for new frame
+		ImGui_ImplWGPU_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 
-		auto cmdEncoder = mGpuObjs->Device.CreateCommandEncoder();
-
-		wgpu::RenderPassDescriptor rPassDesc;
-
-		auto nextSwapTex = mGpuObjs->Swapchain.GetCurrentTextureView();
-		wgpu::RenderPassColorAttachment colorAttachment
+		bool show = true;
 		{
-			.view = nextSwapTex,
-			.loadOp = wgpu::LoadOp::Clear,
-			.storeOp = wgpu::StoreOp::Store,
-			.clearValue = {.r = color.r, .g = color.g, .b = color.b, .a = 1.0}
-		};
-
-		rPassDesc.colorAttachments = &colorAttachment;
-		rPassDesc.colorAttachmentCount = 1;
-		rPassDesc.depthStencilAttachment = nullptr;
-		{
-			wgpu::RenderPassEncoder rPassEnc = cmdEncoder.BeginRenderPass(&rPassDesc);
-
-
-			rPassEnc.End();
+			ImGui::Begin("Window", &show);
+			ImGui::Image(mTexview->Get(), ImVec2(1280, 720));
+			ImGui::End();
 		}
 
-		wgpu::CommandBuffer cmdBuf = cmdEncoder.Finish();
-		nextSwapTex.Release();
-		auto queue = mGpuObjs->Device.GetQueue();
+		{
+			ImGui::Begin("Pick Color", &show);
+			ImGui::ColorPicker3("picker", glm::value_ptr(color));
+			ImGui::End();
+		}
 
+
+	}
+	
+	void Device::EndFrame()
+	{
+
+		//Dispatch compute
+
+		wgpu::Queue queue = mGfx->Device.GetQueue();
+		wgpu::CommandEncoderDescriptor enc_desc = {};
+		wgpu::CommandEncoder cmdencoder = mGfx->Device.CreateCommandEncoder(& enc_desc);
+		
+		auto compCmd = cmdencoder.BeginComputePass();
+		{
+
+			mCompShader->SetupForDispatch(compCmd);
+			compCmd.DispatchWorkgroups(mWindow->GetDimensions().x, mWindow->GetDimensions().y, 1);
+
+		}
+		compCmd.End();
+		auto cmdBuf = cmdencoder.Finish();
 		queue.Submit(1, &cmdBuf);
 
 
+		// Rendering
 
-	}
+		wgpu::RenderPassColorAttachment color_attachments = {};
+		color_attachments.loadOp = wgpu::LoadOp::Clear;
+		color_attachments.storeOp = wgpu::StoreOp::Store;
+		color_attachments.clearValue = {0.0f, 0.0f, 0.0f, 1.0f};
+		color_attachments.view = mGfx->Swapchain.GetCurrentTextureView();
 
-	
-	void Device::Present()
-	{
-		mGpuObjs->Swapchain.Present();
 
+		ImGui::Render();
+		wgpu::RenderPassDescriptor render_pass_desc = {};
+		render_pass_desc.colorAttachmentCount = 1;
+		render_pass_desc.colorAttachments = &color_attachments;
+		render_pass_desc.depthStencilAttachment = 0;
+		wgpu::CommandEncoder encoder = mGfx->Device.CreateCommandEncoder(&enc_desc);
+
+		wgpu::RenderPassEncoder rPass = encoder.BeginRenderPass(&render_pass_desc);
+		ImGui_ImplWGPU_RenderDrawData(ImGui::GetDrawData(), rPass.Get());
+		rPass.End();
+		
+		auto rendercmdBuf = encoder.Finish();
+		queue.Submit(1, &rendercmdBuf);
+
+		mGfx->Swapchain.Present();
 	}
 
 
 	//HELPERS ---------------------
 	void Device::CreateDevice()
 	{
-		mGpuObjs->Instance = wgpu::Instance::Acquire(mGpuObjs->NativeInstance.Get());
+		mGfx->Instance = wgpu::Instance::Acquire(mGfx->NativeInstance.Get());
 #ifdef NDEBUG
-		mGpuObjs->NativeInstance.SetBackendValidationLevel(dawn::native::Disabled);
+		mGfx->NativeInstance.SetBackendValidationLevel(dawn::native::Disabled);
 #else
-		mGpuObjs->NativeInstance.SetBackendValidationLevel(dawn::native::Full);
+		mGfx->NativeInstance.EnableBackendValidation(true);
+		mGfx->NativeInstance.SetBackendValidationLevel(dawn::native::Full);
 #endif // NDEBUG
-		mGpuObjs->NativeInstance.DiscoverDefaultAdapters();
-		auto adapters = mGpuObjs->NativeInstance.GetAdapters();
+		mGfx->NativeInstance.DiscoverDefaultAdapters();
+		auto adapters = mGfx->NativeInstance.GetAdapters();
 		for (auto& adaper : adapters)
 		{
 			wgpu::AdapterProperties properties{};
@@ -88,7 +145,11 @@ namespace Lia
 			{
 				wgpu::DeviceDescriptor deviceDesc{};
 				auto dev = adaper.CreateDevice();
-				mGpuObjs->Device = wgpu::Device::Acquire(dev);
+				mGfx->Device = wgpu::Device::Acquire(dev);
+				mGfx->Device.SetLoggingCallback(DeviceLogCback, nullptr);
+				mGfx->Device.SetUncapturedErrorCallback(DeviceErrorCback, nullptr);
+
+
 				return;
 			}
 			
@@ -106,9 +167,8 @@ namespace Lia
 
 			surfDescWin.hwnd = glfwGetWin32Window(mWindow->GetGLFWWindow());
 			surfDescWin.hinstance = GetModuleHandle(nullptr);
-
 			surfDesc.nextInChain = &surfDescWin;
-			mGpuObjs->Surface = mGpuObjs->Instance.CreateSurface(&surfDesc);
+			mGfx->Surface = mGfx->Instance.CreateSurface(&surfDesc);
 			
 		}
 		{
@@ -119,10 +179,8 @@ namespace Lia
 			swapDesc.presentMode = wgpu::PresentMode::Immediate;
 			swapDesc.usage = wgpu::TextureUsage::RenderAttachment;
 
-			mGpuObjs->Swapchain = mGpuObjs->Device.CreateSwapChain(mGpuObjs->Surface,
+			mGfx->Swapchain = mGfx->Device.CreateSwapChain(mGfx->Surface,
 																&swapDesc);
-
-			
 
 		}
 		return;

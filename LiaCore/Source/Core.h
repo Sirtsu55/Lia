@@ -35,15 +35,28 @@
 #define GLFW_EXPOSE_NATIVE_WAYLAND
 #endif //Detect Platform
 
+//GLFW
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
-
+//IMGUI
+#include <imgui.h>
+#include <backends/imgui_impl_wgpu.h>
+#include <backends/imgui_impl_glfw.h>
 
 //#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
 //#include <vulkan/vulkan.hpp>
 #include <webgpu/webgpu_cpp.h>
 #include <dawn/native/DawnNative.h>
 #include <dawn/dawn_proc.h>
+
+
+
+//---------------------------------------
+//Casting
+//---------------------------------------
+
+#define ReCast reinterpret_cast
+
 //---------------------------------------
 //Shared Pointers
 //---------------------------------------
@@ -72,12 +85,10 @@ constexpr Uptr<T> CreateUptr(Args&& ... args)
 }
 
 
+//Returns a Sptr dereferenced, BE CAREFUL WITH THE DEREFERENCED VALUE
+template<typename T1, typename T2>
+constexpr T1& GetSmartPtrAsRef(const T2&  sptr) { return *(ReCast<T1*>(sptr.get())); }
 
-//---------------------------------------
-//Casting
-//---------------------------------------
-
-#define ReCast reinterpret_cast
 
 
 
