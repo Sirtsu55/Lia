@@ -24,6 +24,7 @@ namespace Lia
 		ImGui::CreateContext();
 		ImGuiIO io = ImGui::GetIO();
 		io.ConfigFlags = ImGuiConfigFlags_DockingEnable;
+		ImGui::GetStyle().WindowPadding = ImVec2(0.0, 0.0);
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
 		ImGui_ImplGlfw_InitForOther(mWindow->GetGLFWWindow(), true);
@@ -36,20 +37,10 @@ namespace Lia
 
 		mGfx->Device.Destroy();
 	}
+
 	void Device::SetupCompute()
 	{
-		mCompShader = CreateUptr<ComputeShader>(mGfx->Device,"Shaders/Compute.comp.spv");
-		Texture::TextureInfo inf{};
-		inf.Dimentions = glm::uvec2(mWindow->GetDimensions());
-		inf.Format = wgpu::TextureFormat::RGBA16Float;
-		inf.Usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::StorageBinding;
-
-		mTex = CreateUptr<Texture>(mGfx->Device, inf);
-		mTexview = mTex->GetView();
-		mCompShader->BindGroupManager.AddStorageTexture(GetSmartPtrAsRef<Texture>(mTex), 0);
-		mCompShader->BindGroupManager.ConstructBindGroups(mGfx->Device);
-
-		mCompShader->CreatePipeline();
+		
 	}
 
 
@@ -60,45 +51,38 @@ namespace Lia
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		bool show = true;
-		{
-			ImGui::Begin("Window", &show);
-			ImGui::Image(mTexview->Get(), ImVec2(1280, 720));
-			ImGui::End();
-		}
-
-		{
-			ImGui::Begin("Pick Color", &show);
-			ImGui::ColorPicker3("picker", glm::value_ptr(color));
-			ImGui::End();
-		}
 
 
 	}
-	
-	void Device::EndFrame()
+
+	void Device::DispatchCompute(Sptr<ComputeShader>& computeShader, const glm::uvec2& size)
 	{
-
 		//Dispatch compute
-
 		wgpu::Queue queue = mGfx->Device.GetQueue();
 		wgpu::CommandEncoderDescriptor enc_desc = {};
-		wgpu::CommandEncoder cmdencoder = mGfx->Device.CreateCommandEncoder(& enc_desc);
-		
+		wgpu::CommandEncoder cmdencoder = mGfx->Device.CreateCommandEncoder(&enc_desc);
+
 		auto compCmd = cmdencoder.BeginComputePass();
 		{
 
-			mCompShader->SetupForDispatch(compCmd);
-			compCmd.DispatchWorkgroups(mWindow->GetDimensions().x, mWindow->GetDimensions().y, 1);
+			computeShader->SetupForDispatch(compCmd);
+			compCmd.DispatchWorkgroups(size.x, size.y, 1);
 
 		}
 		compCmd.End();
 		auto cmdBuf = cmdencoder.Finish();
 		queue.Submit(1, &cmdBuf);
 
-
+	}
+	
+	void Device::EndFrame()
+	{
+		// Render Imgui
 		// Rendering
 
+		wgpu::Queue queue = mGfx->Device.GetQueue();
+
+		wgpu::CommandEncoderDescriptor enc_desc = {};
 		wgpu::RenderPassColorAttachment color_attachments = {};
 		color_attachments.loadOp = wgpu::LoadOp::Clear;
 		color_attachments.storeOp = wgpu::StoreOp::Store;
@@ -143,6 +127,7 @@ namespace Lia
 			LOG_INFO(properties.name);
 			if (properties.backendType == wgpu::BackendType::Vulkan)
 			{
+				//TODO: Select best device
 				wgpu::DeviceDescriptor deviceDesc{};
 				auto dev = adaper.CreateDevice();
 				mGfx->Device = wgpu::Device::Acquire(dev);

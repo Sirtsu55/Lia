@@ -6,7 +6,7 @@ namespace Lia
 	{
 		
 	public:
-		struct TextureInfo
+		struct Info
 		{
 			uint8_t MipMaps = 1;
 			glm::uvec2 Dimentions;
@@ -16,7 +16,7 @@ namespace Lia
 		};
 
 
-		Texture(const wgpu::Device& dev,const TextureInfo& texInfo);
+		Texture(const wgpu::Device& dev,const Info& texInfo);
 		~Texture();
 		Texture(Texture&) = delete;
 		Texture& operator=(Texture&) = delete;
@@ -25,6 +25,10 @@ namespace Lia
 
 		wgpu::TextureFormat GetFormat() const { return mTextureDesc.format; }
 		Sptr<wgpu::TextureView> GetView();
+
+		void Resize(const wgpu::Device& dev, const glm::uvec2& newSize);
+
+
 	private:
 		Sptr<wgpu::TextureView> mDefaultTexView;
 		wgpu::TextureDescriptor mTextureDesc;

@@ -2,8 +2,21 @@
 
 layout(local_size_x = 1, local_size_y = 1) in;
 layout(set = 0, binding = 0, rgba16f) uniform image2D outTex;
+layout(set = 0, binding = 1, std140) uniform UN
+{
+	vec3 color;
+	vec2 size;
+};
+
+
 
 void main()
 {
-	imageStore(outTex, ivec2(gl_GlobalInvocationID.xy), vec4(0.129, 0.624, 0.58, 1.0));
+    ivec2 pos = ivec2( gl_GlobalInvocationID.xy );
+	const vec2 pixelCenter = vec2(gl_GlobalInvocationID.xy) + vec2(0.5f);
+	vec2 UV = (pixelCenter/size);
+
+	vec3 bg = mix(color, vec3(1.0f), UV.y);
+
+	imageStore(outTex, ivec2(gl_GlobalInvocationID.xy), vec4(UV,1.0, 1.0));
 }

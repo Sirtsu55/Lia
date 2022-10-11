@@ -18,7 +18,6 @@ namespace Lia
 		mShaderModule = mDev.CreateShaderModule(&shaderDesc);
 
 
-
 	}
 
 	ComputeShader::~ComputeShader()
@@ -43,9 +42,12 @@ namespace Lia
 	void ComputeShader::SetupForDispatch(const wgpu::ComputePassEncoder& cmdEncoder)
 	{
 		cmdEncoder.SetBindGroup(0, BindGroupManager.mBindGroup);
+
+		
 		cmdEncoder.SetPipeline(mComputePipe);
 	}
 
+	
 	void ComputeShader::CreatePipeLayout()
 	{
 		wgpu::PipelineLayoutDescriptor desc{};

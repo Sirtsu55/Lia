@@ -1,5 +1,5 @@
 #pragma once
-#include "Window.h"
+#include "Utils/Window.h"
 
 
 namespace Lia
@@ -29,24 +29,28 @@ namespace Lia
 		Device(Device&) = delete;
 		Device& operator=(Device&) = delete;
 
+
+		wgpu::Device GetDevice() const { return mGfx->Device; }
 		//TESTING
 		void SetupCompute();
 		void BeginFrame();
 
+
 		void EndFrame();
+		void DispatchCompute(Sptr<ComputeShader>& computeShader, const glm::uvec2& size);
 
 	private:
 		//TESTING
-		glm::vec3 color;
 
-		Uptr<ComputeShader> mCompShader;
-		wgpu::BindGroup mComputeBindGroup;
-		Uptr<Texture> mTex;
-		Sptr<wgpu::TextureView> mTexview;
+
 
 
 		void SetupSwapchain();
 		void CreateDevice();
+
+
+
+
 		struct GpuObjects
 		{
 			wgpu::Surface Surface;

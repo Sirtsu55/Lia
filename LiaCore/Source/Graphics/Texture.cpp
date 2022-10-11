@@ -2,7 +2,7 @@
 
 namespace Lia
 {
-	Texture::Texture(const wgpu::Device& dev, const TextureInfo& texInfo)
+	Texture::Texture(const wgpu::Device& dev, const Info& texInfo)
 	{
 		mTextureDesc.size = wgpu::Extent3D{ .width = texInfo.Dimentions.x, .height = texInfo.Dimentions.y, .depthOrArrayLayers = 1 };
 		mTextureDesc.format = texInfo.Format;
@@ -16,7 +16,6 @@ namespace Lia
 
 	Texture::~Texture()
 	{
-
 	}
 
 	Sptr<wgpu::TextureView> Texture::GetView()
@@ -33,6 +32,14 @@ namespace Lia
 			*mDefaultTexView.get() = std::move(mTexture.CreateView());
 		}
 		return mDefaultTexView;
+	}
+
+	void Texture::Resize(const wgpu::Device& dev, const glm::uvec2& newSize)
+	{
+		mTexture.Destroy();
+		mDefaultTexView = nullptr;
+		mTextureDesc.size = { .width = newSize.x, .height = newSize.y, .depthOrArrayLayers = 1 };
+		mTexture = dev.CreateTexture(&mTextureDesc);
 	}
 
 }

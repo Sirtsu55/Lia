@@ -18,6 +18,7 @@ file(GLOB_RECURSE HEADER_FILES "${PROJECT_SOURCE_DIR}/LiaCore/Source/*.h")
 list(APPEND SRC_FILES ${HEADER_FILES})
 list(APPEND SRC_FILES ${IMGUI_SRC_FILES})
 
+#add_library(LiaCore SHARED ${SRC_FILES})
 add_executable(LiaCore ${SRC_FILES})
 
 target_include_directories(LiaCore PUBLIC 
@@ -63,7 +64,7 @@ CompileShaders()
 
 
 #Copies all depending SHARED LIBS to the executable directory
-CopySharedLib("dawn_proc")
-CopySharedLib("dawn_native")
-CopySharedLib("dawn_platform")
+CopySharedLibDawn("dawn_proc")
+CopySharedLibDawn("dawn_native")
+CopySharedLibDawn("dawn_platform")
 

@@ -1,6 +1,6 @@
 
 
-function(CopySharedLib libname)
+function(CopySharedLibDawn libname)
     if(WIN32)
         set(lib_path "${PROJECT_SOURCE_DIR}/Vendor/Dawn/${LIA_PLATFORM}/${CMAKE_BUILD_TYPE}/${libname}.dll")
     elseif(UNIX)

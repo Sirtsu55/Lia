@@ -28,6 +28,7 @@ namespace Lia
 
 		BGManager BindGroupManager;
 	private:
+
 		//TODO: support many bind groups, NOW IT IS HARDCODED TO ONE BIND GROUP
 		void CreatePipeLayout();
 
