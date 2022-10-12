@@ -16,15 +16,17 @@ void TestApp::Start()
 
 	mCompShader = CreateSptr<Lia::ComputeShader>(mDevice->GetDevice(), "Shaders/Compute.comp.spv");
 
+
+
 	auto bufferUsages = wgpu::BufferUsage::Uniform;
 
 	BackgroudColor = glm::vec3(1.0f, 0.0f, 1.0f);
 	mBuffer = CreateSptr<Lia::Buffer>(mDevice->GetDevice(), bufferUsages, sizeof(glm::vec4) + sizeof(glm::vec2), glm::value_ptr(BackgroudColor));
-
+	
 
 	Lia::Texture::Info inf{};
 	//inf.Dimentions = glm::uvec2(mWindow->GetDimensions());
-	inf.Dimentions = glm::uvec2(50, 20);
+	inf.Dimentions = glm::uvec2(50, 50);
 	inf.Format = wgpu::TextureFormat::RGBA16Float;
 	inf.Usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::StorageBinding;
 	mTex = CreateSptr<Lia::Texture>(mDevice->GetDevice(), inf);
@@ -50,7 +52,6 @@ void TestApp::OnUpdate()
 		ImGui::Begin("Viewport", nullptr);
 		auto winSize = ImGui::GetContentRegionAvail();
 		ImGui::Image(mTex->GetView()->Get(), winSize);
-		
 		ImGui::End();
 	}
 
@@ -64,7 +65,7 @@ void TestApp::OnUpdate()
 		mBuffer->UploadData(glm::value_ptr(RenderSize), sizeof(glm::vec2), sizeof(glm::vec4));
 		mBuffer->UploadData(glm::value_ptr(BackgroudColor), sizeof(glm::vec3), 0);
 	}
-	LOG_INFO("{} {}", RenderSize.x, RenderSize.y);
+
 	LastColor = BackgroudColor;
     mDevice->DispatchCompute(mCompShader, RenderSize);
     mWindow->UpdateInput();

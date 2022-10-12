@@ -24,6 +24,9 @@ namespace Lia
 		ImGui::CreateContext();
 		ImGuiIO io = ImGui::GetIO();
 		io.ConfigFlags = ImGuiConfigFlags_DockingEnable;
+		ImGui::GetStyle().AntiAliasedLinesUseTex = false;
+		
+		
 		ImGui::GetStyle().WindowPadding = ImVec2(0.0, 0.0);
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();
