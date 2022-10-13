@@ -3,6 +3,7 @@
 #include "Graphics/ComputeShader.h"
 #include "Graphics/Buffer.h"
 
+
 void TestApp::Start()
 {
     Lia::Window::Settings settings = { .Name = "LiaEngine", .Resolution = glm::ivec2(1280, 720) };
@@ -14,7 +15,7 @@ void TestApp::Start()
 
 	mDevice->SetupCompute();
 
-	mCompShader = CreateSptr<Lia::ComputeShader>(mDevice->GetDevice(), "Shaders/Compute.comp.spv");
+	mCompShader = CreateSptr<Lia::ComputeShader>(mDevice->GetDevice(), "../LiaCore/Shaders/Compute.comp.spv");
 
 
 
@@ -26,7 +27,7 @@ void TestApp::Start()
 
 	Lia::Texture::Info inf{};
 	//inf.Dimentions = glm::uvec2(mWindow->GetDimensions());
-	inf.Dimentions = glm::uvec2(50, 50);
+	inf.Dimentions = glm::uvec2(400, 400);
 	inf.Format = wgpu::TextureFormat::RGBA16Float;
 	inf.Usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::StorageBinding;
 	mTex = CreateSptr<Lia::Texture>(mDevice->GetDevice(), inf);
@@ -48,7 +49,6 @@ void TestApp::OnUpdate()
 {
     mDevice->BeginFrame();
 	{
-
 		ImGui::Begin("Viewport", nullptr);
 		auto winSize = ImGui::GetContentRegionAvail();
 		ImGui::Image(mTex->GetView()->Get(), winSize);

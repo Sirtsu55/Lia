@@ -49,7 +49,7 @@ void main()
 	}
 	else
 	{
-		float gradient = clamp(UV.y, 0.0, 1.0);
+		float gradient = normalize(UV.y);
 		bg = mix(vec3(1.0f), color, gradient);
 	}
 

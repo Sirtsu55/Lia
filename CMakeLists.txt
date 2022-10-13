@@ -10,6 +10,8 @@ endif()
 
 add_subdirectory("LiaCore")
 
+add_subdirectory("EditorLia")
+
 add_subdirectory("Vendor/spdlog")
 
 add_subdirectory("Vendor/glfw")

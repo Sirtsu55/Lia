@@ -19,7 +19,8 @@ list(APPEND SRC_FILES ${HEADER_FILES})
 list(APPEND SRC_FILES ${IMGUI_SRC_FILES})
 
 #add_library(LiaCore SHARED ${SRC_FILES})
-add_executable(LiaCore ${SRC_FILES})
+
+add_library(LiaCore ${SRC_FILES})
 
 target_include_directories(LiaCore PUBLIC 
 	"${PROJECT_SOURCE_DIR}/Vendor/glfw/include/"
@@ -59,12 +60,8 @@ message(${CMAKE_BUILD_TYPE})
 
 
 include("${PROJECT_SOURCE_DIR}/LiaCore/ShaderCompile.cmake")
-include("${PROJECT_SOURCE_DIR}/LiaCore/CopySharedLib.cmake")
 CompileShaders()
 
 
-#Copies all depending SHARED LIBS to the executable directory
-CopySharedLibDawn("dawn_proc")
-CopySharedLibDawn("dawn_native")
-CopySharedLibDawn("dawn_platform")
+
 
