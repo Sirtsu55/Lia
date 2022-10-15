@@ -4,7 +4,7 @@
 #include "Graphics/Buffer.h"
 
 
-void TestApp::Start()
+void TestApp::OnStart()
 {
     Lia::Window::Settings settings = { .Name = "LiaEngine", .Resolution = glm::ivec2(1280, 720) };
 
@@ -15,7 +15,7 @@ void TestApp::Start()
 
 	mDevice->SetupCompute();
 
-	mCompShader = CreateSptr<Lia::ComputeShader>(mDevice->GetDevice(), "../LiaCore/Shaders/Compute.comp.spv");
+	mCompShader = CreateSptr<Lia::ComputeShader>(mDevice->GetDevice(), "../Resources/Shaders/Compute.comp.spv");
 
 
 
@@ -27,7 +27,7 @@ void TestApp::Start()
 
 	Lia::Texture::Info inf{};
 	//inf.Dimentions = glm::uvec2(mWindow->GetDimensions());
-	inf.Dimentions = glm::uvec2(400, 400);
+	inf.Dimentions = glm::uvec2(50, 50);
 	inf.Format = wgpu::TextureFormat::RGBA16Float;
 	inf.Usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::StorageBinding;
 	mTex = CreateSptr<Lia::Texture>(mDevice->GetDevice(), inf);
@@ -43,9 +43,15 @@ void TestApp::Start()
 	mCompShader->CreatePipeline();
 	mBuffer->UploadData(glm::value_ptr(RenderSize), sizeof(glm::vec2), sizeof(glm::vec4));
 
+	LayerInfo |= Lia::LayerFlags::WindowOpen;
+
 }
 
-void TestApp::OnUpdate()
+void TestApp::BeforeGameLoop(const Lia::LayerData& data)
+{
+}
+
+void TestApp::GameLoop(const Lia::LayerData& data)
 {
     mDevice->BeginFrame();
 	{
@@ -69,11 +75,19 @@ void TestApp::OnUpdate()
 	LastColor = BackgroudColor;
     mDevice->DispatchCompute(mCompShader, RenderSize);
     mWindow->UpdateInput();
+
+	if (!mWindow->IsActive())
+		LayerInfo &= ~Lia::LayerFlags::WindowOpen;
+
 	mDevice->EndFrame();
     //LOG_INFO("Frame Time: {} ms", timer.Endd(TimerAccuracy::MilliSec));
 
 }
 
-void TestApp::Destroy()
+void TestApp::AfterGameLoop(const Lia::LayerData& data)
+{
+}
+
+void TestApp::OnEnd()
 {
 }

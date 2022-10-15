@@ -1,19 +1,19 @@
 #pragma once
 #include "Graphics/Device.h"
-
+#include "Layers/Layer.h"
 
 //Only for testing purposes
-class TestApp
+class TestApp : public Lia::Layer
 {
 public:
 	TestApp() = default;
 	~TestApp() = default;
 
-	void Start();
-
-	void OnUpdate();
-
-	void Destroy();
+	virtual void BeforeGameLoop(const Lia::LayerData& data) override;
+	virtual void GameLoop(const Lia::LayerData& data) override;
+	virtual void AfterGameLoop(const Lia::LayerData& data) override;
+	virtual void OnStart() override;
+	virtual void OnEnd() override;
 
 private:
 	Sptr<Lia::Device> mDevice;
@@ -29,7 +29,6 @@ private:
 	glm::vec3 LastColor;
 	glm::vec2 RenderSize;
 
-	friend int main();
 
 
 };

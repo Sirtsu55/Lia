@@ -1,31 +1,51 @@
 #include "App.h"
-
+#include "EditorLayer.h"
 
 int main()
 {
     Log::Init();
     Lia::Window::Init();
-
     {
-        TestApp* app = new TestApp();
+        /*TODO: Make a Layerhandler that gathers data after
+        everylayer and sends the data through layerdata to 
+        the functions, it would also abstract away the for loops here*/
+        std::vector<Uptr<Lia::Layer>> layers;
+        
+        layers.push_back(CreateUptr<TestApp>());
 
-        app->Start();
-        //Lia::Window::Settings settings = { .Name = "LiaEngine", .Resolution = glm::ivec2(1280, 720) };
+        layers.push_back(CreateUptr<Lia::EditorLayer>());
 
-        //Sptr<Lia::Window> win = CreateSptr<Lia::Window>(settings);
+        Lia::LayerData data{};
 
-        //Lia::Device::Settings devSettings = { win };
-        //Sptr<Lia::Device> dev = CreateSptr<Lia::Device>(devSettings);
-
-        //SimpleTimer frametimer;
-        //dev->SetupCompute();
-        while (app->mWindow->IsActive())
+        for (auto& layer : layers)
         {
-            app->OnUpdate();
+            Lia::LayerData data{};
+            layer->OnStart();
         }
 
-        app->Destroy();
-        delete app;
+
+        while (layers[0]->GetLayerInfo() & Lia::LayerFlags::WindowOpen)
+        {
+            for (auto& layer : layers)
+            {
+                layer->BeforeGameLoop(data);
+            }
+
+            for (auto& layer : layers)
+            {
+                layer->GameLoop(data);
+            }
+
+            for (auto& layer : layers)
+            {
+                layer->AfterGameLoop(data);
+            }
+        }
+        for (auto& layer : layers)
+        {
+            layer->OnEnd();
+        }
+
     }
 
 
