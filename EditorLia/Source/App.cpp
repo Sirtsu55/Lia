@@ -26,8 +26,7 @@ void TestApp::OnStart()
 	
 
 	Lia::Texture::Info inf{};
-	//inf.Dimentions = glm::uvec2(mWindow->GetDimensions());
-	inf.Dimentions = glm::uvec2(50, 50);
+	inf.Dimentions = glm::uvec2(1280, 720);
 	inf.Format = wgpu::TextureFormat::RGBA16Float;
 	inf.Usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::StorageBinding;
 	mTex = CreateSptr<Lia::Texture>(mDevice->GetDevice(), inf);
@@ -73,19 +72,21 @@ void TestApp::GameLoop(const Lia::LayerData& data)
 	}
 
 	LastColor = BackgroudColor;
-    mDevice->DispatchCompute(mCompShader, RenderSize);
-    mWindow->UpdateInput();
 
-	if (!mWindow->IsActive())
-		LayerInfo &= ~Lia::LayerFlags::WindowOpen;
 
-	mDevice->EndFrame();
     //LOG_INFO("Frame Time: {} ms", timer.Endd(TimerAccuracy::MilliSec));
 
 }
 
 void TestApp::AfterGameLoop(const Lia::LayerData& data)
 {
+	mDevice->DispatchCompute(mCompShader, RenderSize);
+	mWindow->UpdateInput();
+
+	if (!mWindow->IsActive())
+		LayerInfo &= ~Lia::LayerFlags::WindowOpen;
+
+	mDevice->EndFrame();
 }
 
 void TestApp::OnEnd()
