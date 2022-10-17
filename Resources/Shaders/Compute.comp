@@ -36,6 +36,24 @@ float IntersectSphere(vec3 rayDir, vec3 sphere, vec3 origin)
 	
 }
 
+float max3 (vec3 v) {
+  return max (max (v.x, v.y), v.z);
+}
+
+float min3 (vec3 v) {
+  return min (min (v.x, v.y), v.z);
+}
+
+
+bool slabs(vec3 origin, vec3 center, vec3 invRaydir) 
+{
+	vec3 p0 = center+0.5;
+	vec3 p1 = center-0.5;
+  vec3 t0 = (p0 - origin.xyz) * invRaydir;
+  vec3 t1 = (p1 - origin.xyz) * invRaydir;
+  vec3 tmin = min(t0,t1), tmax = max(t0,t1);
+  return max3(tmin) <= min3(tmax);
+}
 
 void main()
 {
@@ -51,11 +69,11 @@ void main()
 	//Rotate ray dir with rotation matrix for rotation
 	vec3 rayDir = vec3(UV, -1.0);
 
-	float dist = IntersectSphere(rayDir, vec3(0.0, 0.0, -10.0), origin);
+	//vec2 di = IntersectVoxel(rayDir, vec3(0.0, 0.0, 10.0), origin);
 
-	if( dist > 0.0)
+	if(slabs(origin, vec3(0.0, 0.0, -10.0), 1/rayDir))
 	{
-		bg = vec3(1);
+		bg = vec3(1.0);
 	}
 	else
 	{
