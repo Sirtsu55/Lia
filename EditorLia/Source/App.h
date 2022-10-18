@@ -1,6 +1,7 @@
 #pragma once
 #include "Graphics/Device.h"
 #include "Layers/Layer.h"
+#include "Graphics/RayTracer.h"
 
 //Only for testing purposes
 class TestApp : public Lia::Layer
@@ -16,18 +17,12 @@ public:
 	virtual void OnEnd() override;
 
 private:
-	Sptr<Lia::Device> mDevice;
-	Sptr<Lia::Window> mWindow;
 
-	Sptr<Lia::ComputeShader> mCompShader;
-	Sptr<Lia::Texture> mTex;
-	
-	Sptr<wgpu::TextureView> mTexview;
-	Sptr<Lia::Buffer> mBuffer;
-	
+	Sptr<Lia::RayTracer> mTracer;
+	Sptr<Lia::Window> mWindow;
+	Sptr<Lia::World> mWorld;
 	glm::vec3 BackgroudColor;
 	glm::vec3 LastColor;
-	glm::vec2 RenderSize;
 
 
 

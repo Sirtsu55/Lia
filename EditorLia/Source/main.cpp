@@ -7,7 +7,7 @@ int main()
     Lia::Window::Init();
     {
         /*TODO: Make a Layerhandler that gathers data after
-        everylayer and sends the data through layerdata to 
+        every layer and sends the data through layerdata to 
         the functions, it would also abstract away the for loops here*/
         std::vector<Uptr<Lia::Layer>> layers;
         

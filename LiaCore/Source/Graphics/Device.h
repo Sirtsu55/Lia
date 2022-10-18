@@ -31,12 +31,9 @@ namespace Lia
 
 
 		wgpu::Device GetDevice() const { return mGfx->Device; }
-		//TESTING
-		void SetupCompute();
-		void BeginFrame();
 
+		void RenderImgui();
 
-		void EndFrame();
 		void DispatchCompute(Sptr<ComputeShader>& computeShader, const glm::uvec2& size);
 
 	private:

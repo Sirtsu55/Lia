@@ -2,45 +2,43 @@
 #include "Graphics/Texture.h"
 #include "Graphics/ComputeShader.h"
 #include "Graphics/Buffer.h"
-
+#include "GameWorld/World.h"
 
 void TestApp::OnStart()
 {
-    Lia::Window::Settings settings = { .Name = "LiaEngine", .Resolution = glm::ivec2(1280, 720) };
+    Lia::Window::Settings winSettings = { .Name = "LiaEngine", .Resolution = glm::ivec2(1280, 720) };
 
-    mWindow = CreateSptr<Lia::Window>(settings);
+    mWindow = CreateSptr<Lia::Window>(winSettings);
+	mWorld = CreateSptr<Lia::World>();
 
-    Lia::Device::Settings devSettings = { mWindow };
-    mDevice = CreateSptr<Lia::Device>(devSettings);
+	Lia::RayTracer::Settings rtSettings = {
+		.CanvasSize = glm::vec2(1280, 720),
+		.OutputWindow = mWindow,
+		.RTShaderPath = "../Resources/Shaders/Compute.comp.spv" 
+	};
 
-	mDevice->SetupCompute();
-
-	mCompShader = CreateSptr<Lia::ComputeShader>(mDevice->GetDevice(), "../Resources/Shaders/Compute.comp.spv");
-
-
-
-	auto bufferUsages = wgpu::BufferUsage::Uniform;
+	mTracer = CreateSptr<Lia::RayTracer>(rtSettings);
 
 	BackgroudColor = glm::vec3(1.0f, 0.0f, 1.0f);
-	mBuffer = CreateSptr<Lia::Buffer>(mDevice->GetDevice(), bufferUsages, sizeof(glm::vec4) + sizeof(glm::vec2), glm::value_ptr(BackgroudColor));
-	
 
-	Lia::Texture::Info inf{};
-	inf.Dimentions = glm::uvec2(1289, 720);
-	inf.Format = wgpu::TextureFormat::RGBA16Float;
-	inf.Usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::StorageBinding;
-	mTex = CreateSptr<Lia::Texture>(mDevice->GetDevice(), inf);
-	mTexview = mTex->GetView();
+	auto& data = mTracer->GetUniformData();
+	data.bgColor = glm::vec4(BackgroudColor, 0.0);
+	data.RenderSize = glm::vec2(rtSettings.CanvasSize);
+	mTracer->UpdateUniformBuffer();
 
-	mCompShader->BindGroupManager.AddStorageTexture(GetSmartPtrAsRef<Lia::Texture>(mTex), 0);
-	mCompShader->BindGroupManager.AddBuffer(GetSmartPtrAsRef<Lia::Buffer>(mBuffer), 1, wgpu::BufferBindingType::Uniform);
+	{
+		std::vector<Lia::Voxel> voxels(25);
+		for (int i = 0; i < 25; i++)
+		{
+				voxels[i].Position = glm::vec3(i, 0, -10);
 
-	RenderSize = inf.Dimentions;
 
-	mCompShader->BindGroupManager.ConstructBindGroups(mDevice->GetDevice());
+		}
 
-	mCompShader->CreatePipeline();
-	mBuffer->UploadData(glm::value_ptr(RenderSize), sizeof(glm::vec2), sizeof(glm::vec4));
+		mWorld->AddVoxels(voxels);
+	}
+
+
 
 	LayerInfo |= Lia::LayerFlags::WindowOpen;
 
@@ -52,11 +50,15 @@ void TestApp::BeforeGameLoop(const Lia::LayerData& data)
 
 void TestApp::GameLoop(const Lia::LayerData& data)
 {
-    mDevice->BeginFrame();
+	//Setup Imgui for new frame
+	ImGui_ImplWGPU_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
 	{
 		ImGui::Begin("Viewport", nullptr);
 		auto winSize = ImGui::GetContentRegionAvail();
-		ImGui::Image(mTex->GetView()->Get(), winSize);
+		ImGui::Image(mTracer->GetOutTexView()->Get(), winSize);
 		ImGui::End();
 	}
 
@@ -67,8 +69,9 @@ void TestApp::GameLoop(const Lia::LayerData& data)
 	}
 	if (LastColor != BackgroudColor)
 	{
-		mBuffer->UploadData(glm::value_ptr(RenderSize), sizeof(glm::vec2), sizeof(glm::vec4));
-		mBuffer->UploadData(glm::value_ptr(BackgroudColor), sizeof(glm::vec3), 0);
+		auto& data = mTracer->GetUniformData();
+		data.bgColor = glm::vec4(BackgroudColor, 0.0);
+		mTracer->UpdateUniformBuffer();
 	}
 
 	LastColor = BackgroudColor;
@@ -80,13 +83,14 @@ void TestApp::GameLoop(const Lia::LayerData& data)
 
 void TestApp::AfterGameLoop(const Lia::LayerData& data)
 {
-	mDevice->DispatchCompute(mCompShader, RenderSize);
+	mTracer->TraceWorld(mWorld);
+
 	mWindow->UpdateInput();
 
 	if (!mWindow->IsActive())
 		LayerInfo &= ~Lia::LayerFlags::WindowOpen;
 
-	mDevice->EndFrame();
+	//TODO: Abstract low level Device code to different layer
 }
 
 void TestApp::OnEnd()

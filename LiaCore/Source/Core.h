@@ -16,7 +16,7 @@
 #include <memory>
 #include <sstream>
 #include <filesystem>
-
+#include <ranges>
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

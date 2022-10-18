@@ -41,21 +41,40 @@ namespace Lia
 		mGfx->Device.Destroy();
 	}
 
-	void Device::SetupCompute()
+
+
+
+
+	void Device::RenderImgui()
 	{
-		
-	}
+		// Render Imgui
+		// Rendering
+
+		wgpu::Queue queue = mGfx->Device.GetQueue();
+
+		wgpu::CommandEncoderDescriptor enc_desc = {};
+		wgpu::RenderPassColorAttachment color_attachments = {};
+		color_attachments.loadOp = wgpu::LoadOp::Clear;
+		color_attachments.storeOp = wgpu::StoreOp::Store;
+		color_attachments.clearValue = { 0.0f, 0.0f, 0.0f, 1.0f };
+		color_attachments.view = mGfx->Swapchain.GetCurrentTextureView();
 
 
-	void Device::BeginFrame()
-	{
-		//Setup Imgui for new frame
-		ImGui_ImplWGPU_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		ImGui::Render();
+		wgpu::RenderPassDescriptor render_pass_desc = {};
+		render_pass_desc.colorAttachmentCount = 1;
+		render_pass_desc.colorAttachments = &color_attachments;
+		render_pass_desc.depthStencilAttachment = 0;
+		wgpu::CommandEncoder encoder = mGfx->Device.CreateCommandEncoder(&enc_desc);
 
+		wgpu::RenderPassEncoder rPass = encoder.BeginRenderPass(&render_pass_desc);
+		ImGui_ImplWGPU_RenderDrawData(ImGui::GetDrawData(), rPass.Get());
+		rPass.End();
 
+		auto rendercmdBuf = encoder.Finish();
+		queue.Submit(1, &rendercmdBuf);
 
+		mGfx->Swapchain.Present();
 	}
 
 	void Device::DispatchCompute(Sptr<ComputeShader>& computeShader, const glm::uvec2& size)
@@ -77,38 +96,7 @@ namespace Lia
 		queue.Submit(1, &cmdBuf);
 
 	}
-	
-	void Device::EndFrame()
-	{
-		// Render Imgui
-		// Rendering
 
-		wgpu::Queue queue = mGfx->Device.GetQueue();
-
-		wgpu::CommandEncoderDescriptor enc_desc = {};
-		wgpu::RenderPassColorAttachment color_attachments = {};
-		color_attachments.loadOp = wgpu::LoadOp::Clear;
-		color_attachments.storeOp = wgpu::StoreOp::Store;
-		color_attachments.clearValue = {0.0f, 0.0f, 0.0f, 1.0f};
-		color_attachments.view = mGfx->Swapchain.GetCurrentTextureView();
-
-
-		ImGui::Render();
-		wgpu::RenderPassDescriptor render_pass_desc = {};
-		render_pass_desc.colorAttachmentCount = 1;
-		render_pass_desc.colorAttachments = &color_attachments;
-		render_pass_desc.depthStencilAttachment = 0;
-		wgpu::CommandEncoder encoder = mGfx->Device.CreateCommandEncoder(&enc_desc);
-
-		wgpu::RenderPassEncoder rPass = encoder.BeginRenderPass(&render_pass_desc);
-		ImGui_ImplWGPU_RenderDrawData(ImGui::GetDrawData(), rPass.Get());
-		rPass.End();
-		
-		auto rendercmdBuf = encoder.Finish();
-		queue.Submit(1, &rendercmdBuf);
-
-		mGfx->Swapchain.Present();
-	}
 
 
 	//HELPERS ---------------------
