@@ -26,7 +26,7 @@ void TestApp::OnStart()
 	
 
 	Lia::Texture::Info inf{};
-	inf.Dimentions = glm::uvec2(160, 90);
+	inf.Dimentions = glm::uvec2(1289, 720);
 	inf.Format = wgpu::TextureFormat::RGBA16Float;
 	inf.Usage = wgpu::TextureUsage::TextureBinding | wgpu::TextureUsage::StorageBinding;
 	mTex = CreateSptr<Lia::Texture>(mDevice->GetDevice(), inf);

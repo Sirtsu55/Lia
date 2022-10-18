@@ -17,25 +17,6 @@ layout(set = 0, binding = 1, std140) uniform UN
 
 };
 
-float IntersectSphere(vec3 rayDir, vec3 sphere, vec3 origin)
-{
-	vec3 oToc = origin - sphere;
-	float a = dot(rayDir, rayDir);
-	float b = 2 * dot(rayDir, oToc);
-	float c = dot(oToc, oToc) - 1.0;
-	float disc = b*b - 4*a*c;
-
-	if(disc > 0)
-	{
-		return (-b - sqrt(disc)) / (2*a);
-	}
-	else
-	{
-		return -0.0;
-	}
-	
-}
-
 float max3 (vec3 v) {
   return max (max (v.x, v.y), v.z);
 }
@@ -45,14 +26,19 @@ float min3 (vec3 v) {
 }
 
 
-bool slabs(vec3 origin, vec3 center, vec3 invRaydir) 
+vec4 slabs(vec3 origin, vec3 center, vec3 rayDir) 
 {
-	vec3 p0 = center+0.5;
-	vec3 p1 = center-0.5;
-  vec3 t0 = (p0 - origin.xyz) * invRaydir;
-  vec3 t1 = (p1 - origin.xyz) * invRaydir;
-  vec3 tmin = min(t0,t1), tmax = max(t0,t1);
-  return max3(tmin) <= min3(tmax);
+	vec3 p0 = center+2;
+	vec3 p1 = center-2;
+	vec3 t0 = (p0 - origin.xyz) / rayDir;
+	vec3 t1 = (p1 - origin.xyz) / rayDir;
+	vec3 tmin = min(t0,t1), tmax = max(t0,t1);
+
+	vec2 t = vec2(max3(tmin), min3(tmax));
+
+	vec3 normal = -sign(rayDir)*step(tmin.yzx,tmin.xyz)*step(tmin.zxy,tmin.xyz);
+
+	return t.x <= t.y ? vec4(normal, t.x) : vec4(-1.0);
 }
 
 void main()
@@ -64,16 +50,17 @@ void main()
 	vec2 UV = (-1.0 + 2.0 * pixelCenter.xy / size) * vec2(size.x/size.y, 1.0);
 	
 	vec3 bg;
-	vec3 origin = vec3(0) ;
+	vec3 origin = vec3(-3, 3.0, 0) ;
 	
 	//Rotate ray dir with rotation matrix for rotation
 	vec3 rayDir = vec3(UV, -1.0);
 
 	//vec2 di = IntersectVoxel(rayDir, vec3(0.0, 0.0, 10.0), origin);
+	vec4 rayHit = slabs(origin, vec3(0.0, 0.0, -10), rayDir);
 
-	if(slabs(origin, vec3(0.0, 0.0, -10.0), 1/rayDir))
+	if(rayHit.w >= 0.0)
 	{
-		bg = vec3(1.0);
+		bg = vec3(rayHit.xyz);
 	}
 	else
 	{
