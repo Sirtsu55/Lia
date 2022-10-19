@@ -1,12 +1,10 @@
 #pragma once
+#include "VoxelTree.h"
+
 
 namespace Lia
 {
-	struct Voxel
-	{
-		glm::vec3 Position;
-		float Size;
-	};
+
 	class World
 	{
 
@@ -18,10 +16,10 @@ namespace Lia
 		World(World&) = delete;
 		World& operator=(World&) = delete;
 
-		void AddVoxels(const std::vector<Voxel>& voxels);
+		void AddVoxels(const std::vector<VoxelData>& voxels);
 
 
-		const std::vector<Voxel>& GetAllVoxels() const { return mVoxels; }
+		const std::vector<VoxelData>& GetAllVoxels() const { return mVoxels; }
 		bool AnyVoxelsUpdated() const { return VoxelsUpdated; }
 
 		void _resetvoxelupdated() { VoxelsUpdated = false; }
@@ -29,7 +27,7 @@ namespace Lia
 		bool VoxelsUpdated = false;
 		
 		//std::Vector<SVOTree> mVoxels
-		std::vector<Voxel> mVoxels;
+		std::vector<VoxelData> mVoxels;
 
 
 	};

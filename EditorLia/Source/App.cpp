@@ -27,7 +27,7 @@ void TestApp::OnStart()
 	mTracer->UpdateUniformBuffer();
 
 	{
-		std::vector<Lia::Voxel> voxels(25);
+		std::vector<Lia::VoxelData> voxels(25);
 		for (int i = 0; i < 25; i++)
 		{
 				voxels[i].Position = glm::vec3(i, 0, -10);

@@ -25,7 +25,7 @@ namespace Lia
 		auto bufferUsages = wgpu::BufferUsage::Uniform;
 		mUniformBuffer = CreateSptr<Lia::Buffer>(mDevice->GetDevice(), bufferUsages, sizeof(UniformBufferData), nullptr);
 		bufferUsages = wgpu::BufferUsage::Storage;
-		mVoxelBuffer = CreateSptr<Lia::Buffer>(mDevice->GetDevice(), bufferUsages, sizeof(Voxel) * 25, nullptr);
+		mVoxelBuffer = CreateSptr<Lia::Buffer>(mDevice->GetDevice(), bufferUsages, sizeof(VoxelData) * 25, nullptr);
 
 		mShader->BindGroupManager.AddStorageTexture(GetSmartPtrAsRef<Lia::Texture>(mOutTexture), 0);
 		mShader->BindGroupManager.AddBuffer(GetSmartPtrAsRef<Lia::Buffer>(mUniformBuffer), 1, wgpu::BufferBindingType::Uniform);
@@ -44,7 +44,7 @@ namespace Lia
 		if (world->AnyVoxelsUpdated())
 		{
 			auto voxels = world->GetAllVoxels();
-			mVoxelBuffer->UploadData(voxels.data(), voxels.size() * sizeof(Voxel), 0);
+			mVoxelBuffer->UploadData(voxels.data(), voxels.size() * sizeof(VoxelData), 0);
 			world->_resetvoxelupdated();
 		}
 		mDevice->DispatchCompute(mShader, mInfo.CanvasSize);

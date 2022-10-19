@@ -10,7 +10,7 @@ namespace Lia
 	World::~World()
 	{
 	}
-	void World::AddVoxels(const std::vector<Voxel>& voxels)
+	void World::AddVoxels(const std::vector<VoxelData>& voxels)
 	{
 
 		mVoxels.insert(mVoxels.end(), voxels.begin(), voxels.end());

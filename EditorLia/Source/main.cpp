@@ -12,8 +12,8 @@ int main()
         std::vector<Uptr<Lia::Layer>> layers;
         
         layers.push_back(CreateUptr<TestApp>());
-
         layers.push_back(CreateUptr<Lia::EditorLayer>());
+
 
         Lia::LayerData data{};
 
