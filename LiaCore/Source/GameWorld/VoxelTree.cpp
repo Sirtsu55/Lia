@@ -21,24 +21,9 @@ namespace Lia
 			if (maxLoc < maxVoxelLoc)
 				maxVoxelLoc = maxLoc;
 		}
-		auto s1 = maxVoxelLoc / 4;
-		auto s2 = maxVoxelLoc / 2;
-		auto s3 = maxVoxelLoc / 2;
-		auto s4 = maxVoxelLoc / 2;
-
-		for (auto& v : rawVoxels)
-		{
-			v.Size = abs(v.Size);
-			auto minLoc = v.Position - glm::vec3(v.Size);
-			auto maxLoc = v.Position + glm::vec3(v.Size);
-
-		}
 
 
-		//Count how many voxels are at each of 8 subdivisions 
-		//discard empty spaces 
-		//look at the most dense areas and make a dense tree there
-		//use recursion
+		
 
 	}
 	VoxelTree::~VoxelTree()

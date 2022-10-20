@@ -6,15 +6,12 @@ namespace Lia
 		//has to be aligned(std430)
 		glm::vec3 Position;
 		float Size;
+		glm::vec4 Color;	// 12 bytes
+
 	};
 
-	struct VoxelNode
-	{
-		//has to be aligned(std430)
-		VoxelData Voxel; // 16 bytes
-		uint8_t NextChildMask; // 1 byte
-		glm::vec3 color;	// 12 bytes
-	};
+
+
 	class VoxelTree
 	{
 	public:
@@ -25,6 +22,20 @@ namespace Lia
 		VoxelTree(VoxelTree&) = delete;
 		VoxelTree& operator=(VoxelTree&) = delete;
 	private:
+		struct VoxelNode
+		{
+			//has to be aligned(std430)
+			VoxelData Voxel; // 16 bytes
+			uint32_t GpuBufferSDFStart; // 4 bytes
+
+		};
+		struct VoxelSDF
+		{
+			uint8_t Step0and1; // 4 bytes
+
+		};
+
+
 		std::vector<VoxelNode> 
 
 		
