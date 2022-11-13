@@ -13,10 +13,12 @@ namespace Lia
 	{
 		glm::vec4 bgColor;
 		glm::vec2 RenderSize;
-
+	
 		void SetRenderSize(const glm::vec2& size) { RenderSize = size; }
 		void SetBGColor(const glm::vec4& color) { bgColor = color; }
 	};
+
+	//Handles all the GPU data responsible for raytracing
 	class RayTracer
 	{
 	public:
@@ -36,6 +38,7 @@ namespace Lia
 
 		void TraceWorld(const Sptr<World>& world);
 
+		void UpdateBuffers(Sptr<World>& world);
 		void UpdateUniformBuffer();
 
 
@@ -47,14 +50,19 @@ namespace Lia
 		UniformBufferData mUniformData;
 
 		Settings mInfo;
+
 		Sptr<Device> mDevice;
 		Sptr<ComputeShader> mShader;
 
 		Sptr<Texture> mOutTexture;
 		Sptr<wgpu::TextureView> mOutTexView;
 
+
 		Sptr<Lia::Buffer> mUniformBuffer;
+
 		Sptr<Lia::Buffer> mVoxelBuffer;
+		Sptr<Lia::Buffer> mVoxelTreeBuffer;
+		Sptr<Lia::Buffer> mVoxelMaterialBuffer;
 
 	public:
 

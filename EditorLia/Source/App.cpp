@@ -10,7 +10,7 @@ void TestApp::OnStart()
 
     mWindow = CreateSptr<Lia::Window>(winSettings);
 	mWorld = CreateSptr<Lia::World>();
-
+	
 	Lia::RayTracer::Settings rtSettings = {
 		.CanvasSize = glm::vec2(1280, 720),
 		.OutputWindow = mWindow,
@@ -24,22 +24,22 @@ void TestApp::OnStart()
 	auto& data = mTracer->GetUniformData();
 	data.bgColor = glm::vec4(BackgroudColor, 0.0);
 	data.RenderSize = glm::vec2(rtSettings.CanvasSize);
+
 	mTracer->UpdateUniformBuffer();
 
 	{
-		std::vector<Lia::VoxelData> voxels(25);
-		for (int i = 0; i < 25; i++)
+		std::vector<Lia::VoxelData> voxels(5);
+		for (int i = 0; i < 5; i++)
 		{
-				voxels[i].Position = glm::vec3(i, 0, -10);
-
-
+		
+			voxels[i].Position = glm::vec3(i, i, 0);
+			
 		}
 
-		mWorld->AddVoxels(voxels);
+		mWorld->AddVoxels(voxels, glm::vec3(0, 0, 9.5));
 	}
-
-
-
+	
+	mTracer->UpdateBuffers(mWorld);
 	LayerInfo |= Lia::LayerFlags::WindowOpen;
 
 }
@@ -63,9 +63,9 @@ void TestApp::GameLoop(const Lia::LayerData& data)
 	}
 
 	{
-		ImGui::Begin("Pick Color", NULL);
-		ImGui::ColorPicker3("picker", glm::value_ptr(BackgroudColor));
-		ImGui::End();
+		//ImGui::Begin("Pick Color", NULL);
+		//ImGui::ColorPicker3("picker", glm::value_ptr(BackgroudColor));
+		//ImGui::End();
 	}
 	if (LastColor != BackgroudColor)
 	{
@@ -88,7 +88,7 @@ void TestApp::AfterGameLoop(const Lia::LayerData& data)
 	mWindow->UpdateInput();
 
 	if (!mWindow->IsActive())
-		LayerInfo &= ~Lia::LayerFlags::WindowOpen;
+		LayerInfo &= ~Lia::LayerFlags::WindowOpen; // Removes Flag
 
 	//TODO: Abstract low level Device code to different layer
 }

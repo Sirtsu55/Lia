@@ -13,8 +13,8 @@ namespace Lia
 		Buffer& operator=(Buffer&) = delete;
 
 		void UploadData(void* data, uint32_t size, uint32_t offset);
-		uint32_t GetSize() const { return mSize; }
-		wgpu::Buffer Get() const { return mBuffer; }
+		inline uint32_t GetSize() const { return mSize; }
+		inline wgpu::Buffer Get() const { return mBuffer; }
 	private:
 
 		wgpu::Device mDev;

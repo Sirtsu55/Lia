@@ -16,19 +16,31 @@ namespace Lia
 		World(World&) = delete;
 		World& operator=(World&) = delete;
 
-		void AddVoxels(const std::vector<VoxelData>& voxels);
+		void AddVoxels(const std::vector<VoxelData>& voxels, const glm::vec3 worldPosition);
 
 
-		const std::vector<VoxelData>& GetAllVoxels() const { return mVoxels; }
-		bool AnyVoxelsUpdated() const { return VoxelsUpdated; }
-
-		void _resetvoxelupdated() { VoxelsUpdated = false; }
+		
 	private:
+
+
+
+		std::pair<glm::vec3, glm::vec3> GetBoundingBoxofVoxels(
+			const std::vector<VoxelData>& voxels
+		) const;
+		float GetDistanceToNearestVoxelFromPoint(
+			const glm::vec3& point,
+			const std::vector<VoxelData>& voxels
+		) const;
+
+		//Gets reset when RayTracer Class renders the scene
 		bool VoxelsUpdated = false;
 		
-		//std::Vector<SVOTree> mVoxels
-		std::vector<VoxelData> mVoxels;
+		std::vector<VoxelNode> mVoxelsTree;
 
+		// at the start of every a Signed distance field of an object 
+		//there is a 4byte integer specifying the length of the SDF
+		std::vector<VoxelSDF> mVoxelSDF;
 
+		friend class RayTracer;
 	};
 }
